@@ -1,5 +1,8 @@
+import { promises as fs } from "fs";
+import path from "path";
 import ReviewCard from "./components/ReviewCard";
-import reviewsData from "../data/reviews.json";
+
+export const dynamic = "force-dynamic";
 
 const CATEGORY_HEADINGS: Record<string, string> = {
   Restaurants: "The Best Restaurants",
@@ -16,8 +19,11 @@ export default async function HomePage({
 }) {
   const { cuisine } = await searchParams;
 
+  const reviewsPath = path.join(process.cwd(), "data", "reviews.json");
+  const reviewsData = JSON.parse(await fs.readFile(reviewsPath, "utf-8"));
+
   const reviews = cuisine
-    ? reviewsData.filter((r) => r.category === cuisine)
+    ? reviewsData.filter((r: { category: string }) => r.category === cuisine)
     : reviewsData;
 
   const heading = cuisine
@@ -44,8 +50,9 @@ export default async function HomePage({
       {/* Review grid */}
       {reviews.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {reviews.map((review) => (
-            <ReviewCard key={review.id} review={review} />
+          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+          {reviews.map((review: any) => (
+            <ReviewCard key={review.slug} review={review} />
           ))}
         </div>
       ) : (

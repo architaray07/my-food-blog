@@ -9,20 +9,31 @@ interface Review {
   neighborhood: string;
   priceRange: string;
   shortPreview: string;
-  rating: number;
+  rating: string;
   date: string;
   imageUrl: string;
 }
 
-function getRatingColor(rating: number): string {
-  if (rating >= 4.5) return "bg-emerald-500";
-  if (rating >= 4.0) return "bg-blue-500";
-  if (rating >= 3.5) return "bg-amber-500";
-  return "bg-red-500";
+const GRADE_STYLES: Record<string, string> = {
+  "A+": "bg-emerald-700 text-white",
+  "A":  "bg-emerald-600 text-white",
+  "A-": "bg-emerald-500 text-white",
+  "B+": "bg-yellow-500 text-zinc-900",
+  "B":  "bg-yellow-400 text-zinc-900",
+  "B-": "bg-yellow-300 text-zinc-900",
+  "C+": "bg-orange-600 text-white",
+  "C":  "bg-orange-500 text-white",
+  "C-": "bg-orange-400 text-white",
+  "D":  "bg-red-500 text-white",
+};
+
+function isAList(grade: string): boolean {
+  return grade === "A+" || grade === "A";
 }
 
 function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString("en-US", {
+  const [year, month, day] = dateStr.split("-").map(Number);
+  return new Date(year, month - 1, day).toLocaleDateString("en-US", {
     month: "long",
     day: "numeric",
     year: "numeric",
@@ -41,12 +52,20 @@ export default function ReviewCard({ review }: { review: Review }) {
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             className="object-cover transition-transform duration-500 group-hover:scale-105"
+            unoptimized={review.imageUrl.startsWith("/")}
           />
-          {/* Rating badge */}
+          {/* A-List badge — top left */}
+          {isAList(review.rating) && (
+            <div className="absolute top-3 left-3 flex items-center gap-1 bg-zinc-900/90 backdrop-blur-sm text-white text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-sm">
+              <span className="text-amber-400">★</span>
+              <span>A-List</span>
+            </div>
+          )}
+          {/* Grade badge — top right */}
           <div
-            className={`absolute top-3 right-3 ${getRatingColor(review.rating)} text-white text-sm font-black px-2.5 py-1 rounded-sm`}
+            className={`absolute top-3 right-3 ${GRADE_STYLES[review.rating] ?? "bg-zinc-500 text-white"} text-sm font-black px-2.5 py-1 rounded-sm`}
           >
-            {review.rating.toFixed(1)}
+            {review.rating}
           </div>
         </div>
 

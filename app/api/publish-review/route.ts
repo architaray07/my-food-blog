@@ -19,11 +19,16 @@ export async function POST(request: Request) {
   const neighborhood = formData.get("neighborhood") as string;
   const addressInput = (formData.get("address") as string | null)?.trim();
   const category = formData.get("category") as string;
+  const cuisine = (formData.get("cuisine") as string | null) ?? "";
   const priceRange = formData.get("priceRange") as string;
   const review = formData.get("review") as string;
-  const rating = parseFloat(formData.get("rating") as string);
+  const rating = formData.get("rating") as string;
   const summary = formData.get("summary") as string;
-  const date = formData.get("date") as string;
+
+  // Date is set server-side at publish time so it's never affected by client timezone
+  // or later edits. Format: YYYY-MM-DD in the server's local time.
+  const now = new Date();
+  const date = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
 
   // Build slug from name
   const baseSlug = name
@@ -58,7 +63,7 @@ export async function POST(request: Request) {
       neighborhood,
       "San Francisco",
       category,
-      "" // cuisine not yet known at publish time
+      cuisine
     );
     if (fetched) imageUrl = fetched;
   }
@@ -68,7 +73,7 @@ export async function POST(request: Request) {
     slug,
     name,
     category,
-    cuisine: "",
+    cuisine,
     neighborhood,
     city: "San Francisco",
     priceRange,

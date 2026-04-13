@@ -1,5 +1,37 @@
 [
   {
+    "id": "1776112321055",
+    "slug": "che-fico-1023",
+    "name": "Che Fico",
+    "category": "Restaurants",
+    "cuisine": "Italian",
+    "neighborhood": "Alamo Square",
+    "city": "San Francisco",
+    "priceRange": "$$$",
+    "address": "838 Divisadero St, San Francisco",
+    "shortPreview": "A solid special-occasion Italian spot in Alamo Square with standout pasta, great focaccia, and a gorgeous room — just book well ahead and go in knowing it's a splurge.",
+    "fullReview": "Che Fico in Alamo Square is the kind of place you save for a special occasion — and it holds up to that expectation pretty well. The restaurant has a great look to it: warehouse-style space filled with fresh flowers and greenery, the kind of room that feels festive without trying too hard. Service was warm, though the food did take a while to come out, and given that reservations here need to be made two to three weeks out, it's clearly a popular spot. Worth planning ahead for.\n\nStart with the suppli and the focaccia — both are worth it, and the suppli was a genuine surprise, better than expected. The focaccia comes with a ricotta and olive oil dip that's simple and really good. For pasta, the butternut squash tortelli was the highlight of the meal: perfectly cooked, finished with a balsamic glaze that adds just the right amount of tang. Definitely order that one. The Ode to Rogers pizza is a little more mixed — the crust is excellent and the arugula on top is a nice touch, but the sauce leaned tangy in a way that didn't quite land, and the cheese felt a bit too creamy. Interestingly, it was better cold the next day, so take that for what it's worth.\n\nOverall, Che Fico is a solid Italian spot that does a lot of things well, even if not everything hits perfectly. The pasta alone makes it worth the trip, and the atmosphere adds to the experience in a way that feels appropriate for a celebratory dinner. Just know going in that it's pricey, so set your expectations accordingly — this is a treat-yourself kind of place, not a casual Tuesday night out.",
+    "rating": "A-",
+    "date": "2026-04-13",
+    "imageUrl": "/uploads/che-fico-1023.jpg"
+  },
+  {
+    "id": "1776108826215",
+    "slug": "the-laundromat-sf-5849",
+    "name": "The Laundromat SF",
+    "category": "Restaurants",
+    "cuisine": "American",
+    "neighborhood": "Outer Richmond",
+    "city": "San Francisco",
+    "priceRange": "$$",
+    "address": "3725 Balboa St, San Francisco",
+    "shortPreview": "A reliable Outer Richmond neighborhood spot with a standout Vodka pizza, great olive oil cake, and Smashburger nights worth the wait.",
+    "fullReview": "The Laundromat SF is a bagel, pizza, and burger spot in the Outer Richmond that feels exactly like the kind of neighborhood place San Francisco does really well — homey, unpretentious, and clearly loved by the people who live nearby. The servers are great, the vibe is relaxed, and it makes for a perfect stop after an afternoon at Golden Gate Park or Ocean Beach.\r\n\r\nThe pizzas are available every day, and the Vodka pizza is the move. It's Detroit-style, which can sometimes feel dense and bready, but they get the crust genuinely crispy, and the sauce has a nice tang to it. It's the right size to split between two people. The Brussels sprouts appetizer is a solid starter — just know they come on a goat cheese base, so if that's not your thing, go in aware. Save room for the olive oil cake: it comes with something that's either ricotta or whipped cream (honestly hard to tell, doesn't matter), it's lightly lemony, not too sweet, and it's a really good dessert.\r\n\r\nSmashburger night is a separate thing and worth knowing about — but be prepared for around an hour and a half wait, which is a lot. The burgers are genuinely good though. As a vegetarian, the Impossible Burger hit the spot. It comes with potato salad instead of fries, which isn't the obvious choice and could use a little more salt, but it's still pretty good. Overall, this place delivers across the board — just maybe bring patience if you're going for burgers.",
+    "rating": "A",
+    "date": "2026-04-13",
+    "imageUrl": "/uploads/1776109672872-the-laundromat-sf-5849.jpg"
+  },
+  {
     "id": "1776062342526",
     "slug": "khao-tiew-2526",
     "name": "Khao Tiew",
@@ -11,7 +43,7 @@
     "address": "272 Claremont Blvd, San Francisco, CA 94127",
     "shortPreview": "Genuinely worth the legendary wait — the vegan pad thai with fried oyster mushrooms alone earns the hype at this vegetarian-friendly West Portal Thai spot.",
     "fullReview": "The line wrapping around the block outside Khao Tiew in West Portal tells you everything you need to know — and somehow the food still manages to live up to it. This place has been a little over a year and already has the kind of devoted following most restaurants spend a decade chasing. Yes, you might wait three to four hours for dinner. Yes, you'll be sharing a table with strangers and pressed shoulder-to-shoulder. None of that stopped us from going back, multiple times.\n\nThe vegan pad thai with fried oyster mushrooms is the dish that keeps me going back — deeply savory, a little sweet, with this almost meaty chew from the mushrooms. The tom kha soup is beautifully balanced, the Massuman curry is solid, and honestly, as a vegetarian you'll find plenty to love across the menu. Mushroom fans especially: this kitchen gets you. The Kaya toast with coconut ice cream is worth trying — it leans sweet, but the ice cream cuts through it in the best way.\n\nThe one thing I'd probably skip on repeat visits is the eggplant — not bad, just the least exciting thing on the table when everything else is hitting so hard. Pro tip: show up around 3:30, get in line before the 4pm opening, and you'll be seated with the first wave instead of waiting into the night. It's not a romantic dinner spot and the service is brisk rather than gracious, but the food is consistent, genuinely great, and surprisingly vegetarian-friendly. Worth every minute of that wait.",
-    "rating": 5,
+    "rating": "A+",
     "date": "2026-04-13",
     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/39/Phat_Thai_kung_Chang_Khien_street_stall.jpg/1200px-Phat_Thai_kung_Chang_Khien_street_stall.jpg"
   }

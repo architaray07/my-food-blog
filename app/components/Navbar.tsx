@@ -1,5 +1,16 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import FilterBar from "./FilterBar";
+
+function FilterBarFallback() {
+  return (
+    <div className="border-b border-zinc-200 bg-white sticky top-0 z-10">
+      <div className="max-w-6xl mx-auto px-4">
+        <div className="flex items-center gap-1 py-3 h-[46px]" />
+      </div>
+    </div>
+  );
+}
 
 export default function Navbar() {
   return (
@@ -27,8 +38,10 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Filter bar */}
-      <FilterBar />
+      {/* Filter bar — wrapped in Suspense because FilterBar uses useSearchParams() */}
+      <Suspense fallback={<FilterBarFallback />}>
+        <FilterBar />
+      </Suspense>
     </header>
   );
 }

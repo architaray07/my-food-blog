@@ -19,6 +19,7 @@ interface ReviewForm {
   neighborhood: string;
   address: string;
   category: string;
+  cuisine: string;
   priceRange: string;
   transcript: string;
   photo: File | null;
@@ -26,9 +27,24 @@ interface ReviewForm {
 
 interface Generated {
   review: string;
-  rating: number;
+  rating: string;
   summary: string;
 }
+
+const GRADES = ["A+", "A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D"];
+
+const GRADE_STYLES: Record<string, string> = {
+  "A+": "bg-emerald-700 text-white",
+  "A":  "bg-emerald-600 text-white",
+  "A-": "bg-emerald-500 text-white",
+  "B+": "bg-yellow-500 text-zinc-900",
+  "B":  "bg-yellow-400 text-zinc-900",
+  "B-": "bg-yellow-300 text-zinc-900",
+  "C+": "bg-orange-600 text-white",
+  "C":  "bg-orange-500 text-white",
+  "C-": "bg-orange-400 text-white",
+  "D":  "bg-red-500 text-white",
+};
 
 // ── Constants ──────────────────────────────────────────────────────────────
 const NEIGHBORHOODS: Record<string, string[]> = {
@@ -62,10 +78,14 @@ const NEIGHBORHOODS: Record<string, string[]> = {
 
 const CATEGORIES = ["Restaurants", "Bakery", "Coffee Shop", "Ice Cream", "Bars"];
 const PRICE_RANGES = ["$", "$$", "$$$", "$$$$"];
+const CUISINES = [
+  "American", "Chinese", "French", "Indian", "Italian", "Japanese",
+  "Korean", "Mediterranean", "Mexican", "Middle Eastern", "Thai", "Vietnamese",
+];
 
 const EMPTY_FORM: ReviewForm = {
   name: "", neighborhood: "Mission District", address: "", category: "Restaurants",
-  priceRange: "$$", transcript: "", photo: null,
+  cuisine: "", priceRange: "$$", transcript: "", photo: null,
 };
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -103,6 +123,8 @@ export default function RecordingWidget() {
   const [form, setForm] = useState<ReviewForm>(EMPTY_FORM);
   const [generated, setGenerated] = useState<Generated | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  const [cuisineOther, setCuisineOther] = useState(false);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const recognitionRef = useRef<any>(null);
@@ -245,6 +267,10 @@ export default function RecordingWidget() {
       setError("Please enter the restaurant name.");
       return;
     }
+    if (form.category === "Restaurants" && !form.cuisine.trim()) {
+      setError("Please select a cuisine for this restaurant.");
+      return;
+    }
     setError(null);
     setStage("generating");
 
@@ -259,7 +285,8 @@ export default function RecordingWidget() {
           transcript: form.transcript,
           restaurantName: form.name,
           neighborhood: form.neighborhood,
-          cuisine: form.category,
+          category: form.category,
+          cuisine: form.category === "Restaurants" ? form.cuisine : "",
           priceRange: form.priceRange,
         }),
       });
@@ -297,11 +324,11 @@ export default function RecordingWidget() {
     fd.append("neighborhood", form.neighborhood);
     fd.append("address", form.address);
     fd.append("category", form.category);
+    fd.append("cuisine", form.category === "Restaurants" ? form.cuisine : "");
     fd.append("priceRange", form.priceRange);
     fd.append("review", generated.review);
-    fd.append("rating", String(generated.rating));
+    fd.append("rating", generated.rating);
     fd.append("summary", generated.summary);
-    fd.append("date", new Date().toISOString().split("T")[0]);
     if (form.photo) fd.append("photo", form.photo);
 
     try {
@@ -331,6 +358,7 @@ export default function RecordingWidget() {
     setSeconds(0);
     setPwInput("");
     setPwError(false);
+    setCuisineOther(false);
   };
 
   const closeModal = () => {
@@ -498,13 +526,56 @@ export default function RecordingWidget() {
                     <label className="block text-xs font-bold uppercase tracking-widest text-zinc-400 mb-1.5">Category</label>
                     <select
                       value={form.category}
-                      onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))}
+                      onChange={(e) => {
+                        const cat = e.target.value;
+                        setForm((f) => ({ ...f, category: cat, cuisine: cat !== "Restaurants" ? "" : f.cuisine }));
+                        if (cat !== "Restaurants") setCuisineOther(false);
+                      }}
                       className="w-full border border-zinc-200 rounded-lg px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[#C1440E] bg-white"
                     >
                       {CATEGORIES.map((c) => <option key={c}>{c}</option>)}
                     </select>
                   </div>
                 </div>
+
+                {/* Cuisine — Restaurants only */}
+                {form.category === "Restaurants" && (
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-widest text-zinc-400 mb-1.5">
+                      Cuisine *
+                    </label>
+                    <div className="flex flex-col gap-2">
+                      <select
+                        value={cuisineOther ? "Other" : form.cuisine}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          if (val === "Other") {
+                            setCuisineOther(true);
+                            setForm((f) => ({ ...f, cuisine: "" }));
+                          } else {
+                            setCuisineOther(false);
+                            setForm((f) => ({ ...f, cuisine: val }));
+                          }
+                        }}
+                        className="w-full border border-zinc-200 rounded-lg px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[#C1440E] bg-white"
+                      >
+                        <option value="" disabled>Select cuisine…</option>
+                        {CUISINES.map((c) => <option key={c} value={c}>{c}</option>)}
+                        <option value="Other">Other…</option>
+                      </select>
+                      {cuisineOther && (
+                        <input
+                          type="text"
+                          value={form.cuisine}
+                          onChange={(e) => setForm((f) => ({ ...f, cuisine: e.target.value }))}
+                          placeholder="e.g. Ethiopian, Peruvian, Burmese…"
+                          autoFocus
+                          className="w-full border border-zinc-200 rounded-lg px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[#C1440E]"
+                        />
+                      )}
+                    </div>
+                  </div>
+                )}
 
                 {/* Price range */}
                 <div>
@@ -547,7 +618,10 @@ export default function RecordingWidget() {
 
                 <button
                   onClick={generateReview}
-                  disabled={!form.name.trim()}
+                  disabled={
+                    !form.name.trim() ||
+                    (form.category === "Restaurants" && !form.cuisine.trim())
+                  }
                   className="w-full py-3.5 bg-[#C1440E] text-white rounded-xl font-bold text-sm hover:bg-[#a33a0b] transition-colors disabled:opacity-40"
                 >
                   Generate Review
@@ -572,15 +646,24 @@ export default function RecordingWidget() {
                     <h2 className="text-xl font-black">{form.name}</h2>
                     <p className="text-sm text-zinc-500">{form.neighborhood} · {form.priceRange}</p>
                   </div>
-                  <div className="flex flex-col items-center">
-                    <input
-                      type="number"
-                      min="1" max="5" step="0.5"
-                      value={generated.rating}
-                      onChange={(e) => setGenerated((g) => g ? { ...g, rating: parseFloat(e.target.value) } : g)}
-                      className="w-16 text-2xl font-black text-center border-b-2 border-[#C1440E] outline-none bg-transparent"
-                    />
-                    <span className="text-xs text-zinc-400 font-semibold uppercase tracking-widest">Rating</span>
+                  <div className="flex flex-col items-end gap-1">
+                    <div className="flex flex-wrap gap-1 justify-end max-w-[160px]">
+                      {GRADES.map((g) => (
+                        <button
+                          key={g}
+                          type="button"
+                          onClick={() => setGenerated((gen) => gen ? { ...gen, rating: g } : gen)}
+                          className={`px-2 py-0.5 rounded-sm text-xs font-black transition-all ${
+                            generated.rating === g
+                              ? `${GRADE_STYLES[g]} ring-2 ring-offset-1 ring-zinc-300 scale-110`
+                              : `${GRADE_STYLES[g]} opacity-40 hover:opacity-80`
+                          }`}
+                        >
+                          {g}
+                        </button>
+                      ))}
+                    </div>
+                    <span className="text-[10px] text-zinc-400 font-semibold uppercase tracking-widest">Grade</span>
                   </div>
                 </div>
 

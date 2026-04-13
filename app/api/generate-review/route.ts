@@ -12,13 +12,23 @@ Style:
 - Write exactly 3 paragraphs separated by \\n\\n — no more, no less
 - Never start with "I recently visited..." or "I had the pleasure of..."
 - Cover what to order and, if relevant, what to skip — only if the transcript mentions it
-- Rating: 1.0 to 5.0 in 0.5 increments, reflecting the actual sentiment expressed
+- Rating: one letter grade from this list: A+, A, A-, B+, B, B-, C+, C, C-, D
+  - A+ = exceptional, must-go destination
+  - A  = excellent, highly recommend
+  - A- = very good, worth a special trip
+  - B+ = good, worth going
+  - B  = solid, dependable
+  - B- = decent, some reservations
+  - C+ = mediocre, mixed experience
+  - C  = below average
+  - C- = poor
+  - D  = avoid
 
-Return JSON only: { "review": "paragraph one\\n\\nparagraph two\\n\\nparagraph three", "rating": 4.5, "summary": "one sentence for card preview" }`;
+Return JSON only: { "review": "paragraph one\\n\\nparagraph two\\n\\nparagraph three", "rating": "A", "summary": "one sentence for card preview" }`;
 
 export async function POST(request: Request) {
   const body = await request.json();
-  const { password, transcript, restaurantName, neighborhood, cuisine: category, priceRange } = body;
+  const { password, transcript, restaurantName, neighborhood, category, cuisine, priceRange } = body;
 
   if (password !== process.env.ADMIN_PASSWORD) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -36,7 +46,7 @@ export async function POST(request: Request) {
   const userMessage = `Write a review for:
 Restaurant: ${restaurantName}
 Neighborhood: ${neighborhood}, San Francisco
-Category: ${category}
+Category: ${category}${cuisine ? `\nCuisine: ${cuisine}` : ""}
 Price range: ${priceRange}
 
 Voice note transcript:

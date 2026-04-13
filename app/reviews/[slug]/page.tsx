@@ -1,18 +1,41 @@
 import { promises as fs } from "fs";
 import path from "path";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import ReviewEditableBody from "../../components/ReviewEditableBody";
+import EditableHeroImage from "../../components/EditableHeroImage";
 
 // Always read from disk so image refreshes and edits show without restarting the server
 export const dynamic = "force-dynamic";
 
-function getRatingColor(rating: number): string {
-  if (rating >= 4.5) return "bg-emerald-500";
-  if (rating >= 4.0) return "bg-blue-500";
-  if (rating >= 3.5) return "bg-amber-500";
-  return "bg-red-500";
+function formatDate(dateStr: string): string {
+  const [year, month, day] = dateStr.split("-").map(Number);
+  return new Date(year, month - 1, day).toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
+const GRADE_STYLES: Record<string, string> = {
+  "A+": "bg-emerald-700",
+  "A":  "bg-emerald-600",
+  "A-": "bg-emerald-500",
+  "B+": "bg-yellow-500",
+  "B":  "bg-yellow-400",
+  "B-": "bg-yellow-300",
+  "C+": "bg-orange-600",
+  "C":  "bg-orange-500",
+  "C-": "bg-orange-400",
+  "D":  "bg-red-500",
+};
+
+const GRADE_TEXT: Record<string, string> = {
+  "B+": "text-zinc-900", "B": "text-zinc-900", "B-": "text-zinc-900",
+};
+
+function isAList(grade: string): boolean {
+  return grade === "A+" || grade === "A";
 }
 
 export default async function ReviewPage(props: PageProps<"/reviews/[slug]">) {
@@ -26,45 +49,24 @@ export default async function ReviewPage(props: PageProps<"/reviews/[slug]">) {
 
   return (
     <main>
-      {/* Hero image */}
-      <div className="relative w-full h-[50vh] md:h-[60vh] bg-zinc-900">
-        <Image
-          src={review.imageUrl}
-          alt={`Photo for ${review.name} restaurant review`}
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover opacity-80"
-        />
-        {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-
-        {/* Header content on image */}
-        <div className="absolute bottom-0 left-0 right-0 max-w-3xl mx-auto px-4 pb-8">
-          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-white/70 mb-3">
-            <Link href="/" className="hover:text-white transition-colors">
-              Reviews
-            </Link>
-            <span>›</span>
-            <span>{review.category}</span>
-          </div>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white leading-tight">
-            {review.name}
-          </h1>
-        </div>
-      </div>
+      <EditableHeroImage
+        slug={review.slug}
+        imageUrl={review.imageUrl}
+        name={review.name}
+        category={review.category}
+      />
 
       {/* Content */}
       <div className="max-w-3xl mx-auto px-4 py-10">
         {/* Rating + meta row */}
         <div className="flex items-center gap-5 mb-8 pb-6 border-b border-zinc-200">
-          {/* Rating circle */}
+          {/* Grade circle */}
           <div
-            className={`${getRatingColor(review.rating)} text-white w-16 h-16 rounded-full flex items-center justify-center shrink-0`}
-            aria-label={`Rating: ${review.rating} out of 5`}
+            className={`${GRADE_STYLES[review.rating] ?? "bg-zinc-500"} ${GRADE_TEXT[review.rating] ?? "text-white"} w-16 h-16 rounded-full flex items-center justify-center shrink-0`}
+            aria-label={`Grade: ${review.rating}`}
           >
-            <span className="text-2xl font-black leading-none">
-              {review.rating.toFixed(1)}
+            <span className="text-xl font-black leading-none tracking-tight">
+              {review.rating}
             </span>
           </div>
 
@@ -91,8 +93,21 @@ export default async function ReviewPage(props: PageProps<"/reviews/[slug]">) {
           </div>
         </div>
 
+        {/* A-List banner — only for A+ and A */}
+        {isAList(review.rating) && (
+          <div className="flex items-center gap-2.5 mb-8 bg-zinc-900 text-white px-4 py-3 rounded-sm">
+            <span className="text-amber-400 text-base">★</span>
+            <span className="text-xs font-black uppercase tracking-[0.2em]">A-List</span>
+            <span className="text-zinc-500 text-xs">—</span>
+            <span className="text-xs text-zinc-400 font-medium">One of the best spots in San Francisco</span>
+          </div>
+        )}
+
         <ReviewEditableBody
           slug={review.slug}
+          category={review.category}
+          cuisine={review.cuisine ?? ""}
+          rating={review.rating}
           shortPreview={review.shortPreview}
           fullReview={review.fullReview}
         />
