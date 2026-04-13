@@ -1,0 +1,46 @@
+{
+  "bio": [
+    "Hi, I'm Archita! For as long as I can remember, I've been the person friends and family text when they need a restaurant rec — date night, birthday dinner, quick lunch, you name it. This blog is just me finally putting all of that in one place.",
+    "I went to UC Berkeley, where I spent four years eating my way through the East Bay — indulging in endless Cheeseboard runs before class, chocolate almond croissants at Fournée Bakery on Saturday mornings, and pizza nights at Rose Pizzeria. I came out the other side with strong opinions and a deep appreciation for the Bay Area food scene.",
+    "These days I live in North Beach (yes, I eat a lot of pasta) and work as a consultant in the Financial District. I'm vegetarian, which people always assume makes this harder — it doesn't, it just makes me more creative. There's nothing I love more than finding a place before it blows up, but I'm equally obsessed with the city classics that have been around forever for a reason. The Bay Area is one of the best places in the world to eat, and I take that very seriously.",
+    "Thanks for following along! "
+  ],
+  "facts": [
+    {
+      "emoji": "🍜",
+      "label": "Favorite cuisine",
+      "value": "Thai food",
+      "note": "Always and forever."
+    },
+    {
+      "emoji": "🏆",
+      "label": "Best meal in SF",
+      "value": "Khao Tiew",
+      "note": "You'll know when you try it."
+    },
+    {
+      "emoji": "☕",
+      "label": "Best coffee",
+      "value": "Compton's Coffee House",
+      "note": "Don't @ me."
+    },
+    {
+      "emoji": "🥐",
+      "label": "Best bakery",
+      "value": "Arsicault",
+      "note": "The croissant changed me."
+    },
+    {
+      "emoji": "🌮",
+      "label": "Favorite food neighborhood",
+      "value": "The Mission",
+      "note": "An obvious answer that is still correct."
+    },
+    {
+      "emoji": "👎",
+      "label": "Most overrated spot",
+      "value": "Golden Boy",
+      "note": "I said what I said."
+    }
+  ]
+}

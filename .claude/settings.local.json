@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run:*)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/)",
+      "WebSearch",
+      "Bash(curl -sI \"https://source.unsplash.com/_wBJ0cvKhIE/1200x800\")",
+      "Bash(curl -sIL \"https://source.unsplash.com/_wBJ0cvKhIE/1200x800\")",
+      "WebFetch(domain:commons.wikimedia.org)"
+    ]
+  }
+}
