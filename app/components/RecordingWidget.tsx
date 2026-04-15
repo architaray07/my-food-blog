@@ -76,7 +76,7 @@ const NEIGHBORHOODS: Record<string, string[]> = {
   ],
 };
 
-const CATEGORIES = ["Restaurants", "Bakery", "Coffee Shop", "Ice Cream", "Bars"];
+const CATEGORIES = ["Restaurants", "Bakery", "Coffee Shop", "Ice Cream"];
 const PRICE_RANGES = ["$", "$$", "$$$", "$$$$"];
 const CUISINES = [
   "American", "Chinese", "French", "Indian", "Italian", "Japanese",
@@ -125,6 +125,7 @@ export default function RecordingWidget() {
   const [error, setError] = useState<string | null>(null);
 
   const [cuisineOther, setCuisineOther] = useState(false);
+  const [lookupState, setLookupState] = useState<"idle" | "loading" | "done" | "error">("idle");
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const recognitionRef = useRef<any>(null);
@@ -349,6 +350,37 @@ export default function RecordingWidget() {
   };
 
   // ── Reset ─────────────────────────────────────────────────────────────────
+  // ── Place lookup ──────────────────────────────────────────────────────────────
+  const lookupPlace = async (name: string) => {
+    if (name.trim().length < 2) return;
+    setLookupState("loading");
+    try {
+      const res = await fetch("/api/lookup-place", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: name.trim(),
+          neighborhood: form.neighborhood,
+          transcript: form.transcript,
+        }),
+      });
+      if (!res.ok) { setLookupState("error"); return; }
+      const data = await res.json();
+      setForm((f) => ({
+        ...f,
+        name: data.name || f.name,
+        address: data.address || f.address,
+        category: data.category || f.category,
+        cuisine: data.category === "Restaurants" ? (data.cuisine || f.cuisine) : f.cuisine,
+        priceRange: data.priceRange || f.priceRange,
+      }));
+      if (data.category !== "Restaurants") setCuisineOther(false);
+      setLookupState("done");
+    } catch {
+      setLookupState("error");
+    }
+  };
+
   const reset = () => {
     setStage("idle");
     setForm(EMPTY_FORM);
@@ -359,6 +391,7 @@ export default function RecordingWidget() {
     setPwInput("");
     setPwError(false);
     setCuisineOther(false);
+    setLookupState("idle");
   };
 
   const closeModal = () => {
@@ -486,10 +519,23 @@ export default function RecordingWidget() {
                   <input
                     type="text"
                     value={form.name}
-                    onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+                    onChange={(e) => {
+                      setForm((f) => ({ ...f, name: e.target.value }));
+                      setLookupState("idle");
+                    }}
+                    onBlur={(e) => lookupPlace(e.target.value)}
                     placeholder="e.g. Tartine Bakery"
                     className="w-full border border-zinc-200 rounded-lg px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[#C1440E]"
                   />
+                  {lookupState === "loading" && (
+                    <p className="text-[11px] text-zinc-400 mt-1">Looking up on Google…</p>
+                  )}
+                  {lookupState === "done" && (
+                    <p className="text-[11px] text-emerald-600 mt-1">✓ Auto-filled from Google</p>
+                  )}
+                  {lookupState === "error" && (
+                    <p className="text-[11px] text-zinc-400 mt-1">Couldn&apos;t find on Google — fill in manually</p>
+                  )}
                 </div>
 
                 {/* Address */}

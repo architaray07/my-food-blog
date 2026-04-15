@@ -8,7 +8,6 @@ const CATEGORY_HEADINGS: Record<string, string> = {
   Bakery: "The Best Bakeries",
   "Coffee Shop": "The Best Coffee Shops",
   "Ice Cream": "The Best Ice Cream",
-  Bars: "The Best Bars",
 };
 
 export default async function HomePage({

@@ -3,7 +3,7 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
 
-const CUISINES = ["All", "Restaurants", "Bakery", "Coffee Shop", "Ice Cream", "Bars"];
+const CUISINES = ["All", "Restaurants", "Bakery", "Coffee Shop", "Ice Cream"];
 
 export default function FilterBar() {
   const router = useRouter();
