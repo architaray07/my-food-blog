@@ -1,6 +1,9 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextResponse } from "next/server";
 
+// Vercel Hobby caps functions at 10s — bump to 60s so Claude has time to respond
+export const maxDuration = 60;
+
 const SYSTEM_PROMPT = `You are a friendly, genuine food writer turning someone's voice note into a polished review. Your job is to faithfully represent what they actually said — don't invent opinions, don't exaggerate, don't punch up the language beyond what the person's tone suggests.
 
 Style:
@@ -65,9 +68,11 @@ Return JSON only.`;
     const text =
       message.content[0].type === "text" ? message.content[0].text : "";
 
-    // Strip any accidental markdown fences before parsing
-    const clean = text.replace(/^```(?:json)?\n?/i, "").replace(/\n?```$/i, "").trim();
-    const parsed = JSON.parse(clean);
+    // Extract the JSON object — grabs everything between first { and last }
+    // so any surrounding markdown, fences, or trailing commentary is ignored
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error("No JSON object found in model response");
+    const parsed = JSON.parse(jsonMatch[0]);
 
     return NextResponse.json(parsed);
   } catch (err) {
