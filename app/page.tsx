@@ -1,6 +1,5 @@
-import { promises as fs } from "fs";
-import path from "path";
 import ReviewCard from "./components/ReviewCard";
+import { getReviews } from "./lib/db";
 
 export const dynamic = "force-dynamic";
 
@@ -19,11 +18,10 @@ export default async function HomePage({
 }) {
   const { cuisine } = await searchParams;
 
-  const reviewsPath = path.join(process.cwd(), "data", "reviews.json");
-  const reviewsData = JSON.parse(await fs.readFile(reviewsPath, "utf-8"));
+  const reviewsData = await getReviews();
 
   const reviews = cuisine
-    ? reviewsData.filter((r: { category: string }) => r.category === cuisine)
+    ? reviewsData.filter((r) => r.category === cuisine)
     : reviewsData;
 
   const heading = cuisine

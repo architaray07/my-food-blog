@@ -1,9 +1,8 @@
-import { promises as fs } from "fs";
-import path from "path";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import ReviewEditableBody from "../../components/ReviewEditableBody";
 import EditableHeroImage from "../../components/EditableHeroImage";
+import { getReviews } from "../../lib/db";
 
 // Always read from disk so image refreshes and edits show without restarting the server
 export const dynamic = "force-dynamic";
@@ -41,9 +40,8 @@ function isAList(grade: string): boolean {
 export default async function ReviewPage(props: PageProps<"/reviews/[slug]">) {
   const { slug } = await props.params;
 
-  const reviewsPath = path.join(process.cwd(), "data", "reviews.json");
-  const reviewsData = JSON.parse(await fs.readFile(reviewsPath, "utf-8"));
-  const review = reviewsData.find((r: { slug: string }) => r.slug === slug);
+  const reviewsData = await getReviews();
+  const review = reviewsData.find((r) => r.slug === slug);
 
   if (!review) notFound();
 

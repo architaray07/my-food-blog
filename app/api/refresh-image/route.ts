@@ -1,7 +1,6 @@
-import { promises as fs } from "fs";
-import path from "path";
 import { NextResponse } from "next/server";
 import { fetchRestaurantImage } from "../../lib/fetchRestaurantImage";
+import { getReviews, saveReviews } from "../../lib/db";
 
 export async function POST(request: Request) {
   const body = await request.json();
@@ -11,9 +10,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const reviewsPath = path.join(process.cwd(), "data", "reviews.json");
-  const reviews = JSON.parse(await fs.readFile(reviewsPath, "utf-8"));
-  const idx = reviews.findIndex((r: { slug: string }) => r.slug === slug);
+  const reviews = await getReviews();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const idx = reviews.findIndex((r: any) => r.slug === slug);
 
   if (idx === -1) {
     return NextResponse.json({ error: "Review not found" }, { status: 404 });
@@ -37,7 +36,7 @@ export async function POST(request: Request) {
   }
 
   reviews[idx].imageUrl = imageUrl;
-  await fs.writeFile(reviewsPath, JSON.stringify(reviews, null, 2));
+  await saveReviews(reviews);
 
   return NextResponse.json({ success: true, imageUrl });
 }

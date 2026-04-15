@@ -1,11 +1,7 @@
-import { promises as fs } from "fs";
-import path from "path";
 import { NextResponse } from "next/server";
 import { fetchRestaurantImage } from "../../lib/fetchRestaurantImage";
-
-// NOTE: This route writes to data/reviews.json on the local filesystem.
-// This works perfectly in development. On Vercel (production), the filesystem
-// is read-only — migrate to Supabase when you're ready to deploy.
+import { getReviews, saveReviews } from "../../lib/db";
+import { uploadImage } from "../../lib/blob-storage";
 
 export async function POST(request: Request) {
   const formData = await request.formData();
@@ -47,17 +43,14 @@ export async function POST(request: Request) {
       const buffer = Buffer.from(await photo.arrayBuffer());
       const ext = (photo.name.split(".").pop() || "jpg").toLowerCase();
       const filename = `${slug}.${ext}`;
-      const uploadDir = path.join(process.cwd(), "public", "uploads");
-      await fs.mkdir(uploadDir, { recursive: true });
-      await fs.writeFile(path.join(uploadDir, filename), buffer);
-      imageUrl = `/uploads/${filename}`;
+      imageUrl = await uploadImage(buffer, filename);
     } catch {
       console.warn("Photo upload failed, falling back to auto-fetch");
     }
   }
 
   // No uploaded photo — try to find one automatically
-  if (!imageUrl.startsWith("/uploads/")) {
+  if (!imageUrl.startsWith("/uploads/") && !imageUrl.includes("blob.vercel-storage.com")) {
     const fetched = await fetchRestaurantImage(
       name,
       neighborhood,
@@ -86,10 +79,9 @@ export async function POST(request: Request) {
   };
 
   // Read → prepend → write
-  const reviewsPath = path.join(process.cwd(), "data", "reviews.json");
-  const existing = JSON.parse(await fs.readFile(reviewsPath, "utf-8"));
+  const existing = await getReviews();
   existing.unshift(newReview);
-  await fs.writeFile(reviewsPath, JSON.stringify(existing, null, 2));
+  await saveReviews(existing);
 
   return NextResponse.json({ success: true, slug });
 }

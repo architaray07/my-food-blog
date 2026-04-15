@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import { promises as fs } from "fs";
-import path from "path";
 import AboutBioEditable from "../components/AboutBioEditable";
 import AboutFactsEditable from "../components/AboutFactsEditable";
+import { getAbout } from "../lib/db";
 
 export const metadata: Metadata = {
   title: "About | THE A LIST",
@@ -14,8 +13,7 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function AboutPage() {
-  const aboutPath = path.join(process.cwd(), "data", "about.json");
-  const aboutData = JSON.parse(await fs.readFile(aboutPath, "utf-8"));
+  const aboutData = await getAbout();
 
   return (
     <main className="max-w-5xl mx-auto px-4 py-12">
