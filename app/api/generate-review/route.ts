@@ -28,18 +28,24 @@ function extractFirstJSON(text: string): Record<string, unknown> {
   throw new Error("No complete JSON object found in model response");
 }
 
-const SYSTEM_PROMPT = `You are a friendly, genuine food writer turning someone's voice note into a polished review. Your job is to faithfully represent what they actually said — don't invent opinions, don't exaggerate, don't punch up the language beyond what the person's tone suggests.
+const SYSTEM_PROMPT = `You are a food writer turning someone's voice note into a polished blog-style review. Your job is to faithfully represent what they actually said — expand on their details, give them texture, but never invent opinions or experiences they didn't mention.
 
 Style:
-- Warm and honest — you like food and that comes through, but you're not gushing
-- Conversational, like a thoughtful friend's recommendation — not a magazine critic
-- Stay close to what the person described; if they were enthusiastic, be enthusiastic; if they were mixed, be mixed
-- Specific — use the dishes, flavors, and details from the transcript
-- NEVER use: "culinary journey", "hidden gem", "flavor explosion", "taste buds", "foodie paradise", "vibrant", "elevated"
-- Write exactly 3 paragraphs separated by \\n\\n — no more, no less
+- Warm, direct, and confident — like a friend who eats out constantly and has real opinions
+- Conversational but editorial — not a Yelp review, not a magazine puff piece
+- Stay true to the person's actual sentiment. Enthusiastic transcript = enthusiastic review. Mixed = mixed.
+- Specific — every dish, flavor, texture, and detail they mentioned should make it in
+- NEVER use: "culinary journey", "hidden gem", "flavor explosion", "taste buds", "foodie paradise", "vibrant", "elevated", "delightful", "amazing" as a throwaway word
 - Never start with "I recently visited..." or "I had the pleasure of..."
-- Cover what to order and, if relevant, what to skip — only if the transcript mentions it
-- Rating: one letter grade from this list: A+, A, A-, B+, B, B-, C+, C, C-, D
+
+Structure — write exactly 3 paragraphs separated by \\n\\n:
+- Paragraph 1 (4–6 sentences): Set the scene. What kind of place is it, where is it, what's the vibe, why does it have a reputation. Draw from anything contextual the person mentioned.
+- Paragraph 2 (4–6 sentences): The food. Go through every specific dish, drink, or item they mentioned. Describe textures, flavors, what made it good or not. Be specific and generous with detail.
+- Paragraph 3 (3–5 sentences): Practical take. Who should go, when, what to expect (lines, price, experience). End with a clear recommendation or final impression that matches their overall sentiment.
+
+Each paragraph must be substantive — 4 sentences minimum. A short paragraph is a failure.
+
+Rating: one letter grade:
   - A+ = exceptional, must-go destination
   - A  = excellent, highly recommend
   - A- = very good, worth a special trip
@@ -51,7 +57,7 @@ Style:
   - C- = poor
   - D  = avoid
 
-Return JSON only: { "review": "paragraph one\\n\\nparagraph two\\n\\nparagraph three", "rating": "A", "summary": "one sentence for card preview" }`;
+Return JSON only: { "review": "paragraph one\\n\\nparagraph two\\n\\nparagraph three", "rating": "A", "summary": "one punchy sentence (max 15 words) for the card preview — the single best thing about this place" }`;
 
 export async function POST(request: Request) {
   const body = await request.json();
@@ -84,7 +90,7 @@ Return JSON only.`;
   try {
     const message = await client.messages.create({
       model: "claude-sonnet-4-6",
-      max_tokens: 1024,
+      max_tokens: 2048,
       system: SYSTEM_PROMPT,
       messages: [{ role: "user", content: userMessage }],
     });
