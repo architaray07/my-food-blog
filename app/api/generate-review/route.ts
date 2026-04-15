@@ -4,6 +4,30 @@ import { NextResponse } from "next/server";
 // Vercel Hobby caps functions at 10s — bump to 60s so Claude has time to respond
 export const maxDuration = 60;
 
+/** Walk the string character by character to find the first balanced {...} block. */
+function extractFirstJSON(text: string): Record<string, unknown> {
+  const start = text.indexOf("{");
+  if (start === -1) throw new Error("No JSON object found in model response");
+
+  let depth = 0;
+  let inString = false;
+  let escape = false;
+
+  for (let i = start; i < text.length; i++) {
+    const ch = text[i];
+    if (escape) { escape = false; continue; }
+    if (ch === "\\" && inString) { escape = true; continue; }
+    if (ch === '"') { inString = !inString; continue; }
+    if (inString) continue;
+    if (ch === "{") depth++;
+    if (ch === "}") {
+      depth--;
+      if (depth === 0) return JSON.parse(text.slice(start, i + 1));
+    }
+  }
+  throw new Error("No complete JSON object found in model response");
+}
+
 const SYSTEM_PROMPT = `You are a friendly, genuine food writer turning someone's voice note into a polished review. Your job is to faithfully represent what they actually said — don't invent opinions, don't exaggerate, don't punch up the language beyond what the person's tone suggests.
 
 Style:
@@ -68,11 +92,10 @@ Return JSON only.`;
     const text =
       message.content[0].type === "text" ? message.content[0].text : "";
 
-    // Extract the JSON object — grabs everything between first { and last }
-    // so any surrounding markdown, fences, or trailing commentary is ignored
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) throw new Error("No JSON object found in model response");
-    const parsed = JSON.parse(jsonMatch[0]);
+    // Extract the first complete JSON object by counting braces.
+    // This correctly handles braces inside string values and ignores
+    // any preamble or trailing commentary the model adds.
+    const parsed = extractFirstJSON(text);
 
     return NextResponse.json(parsed);
   } catch (err) {
